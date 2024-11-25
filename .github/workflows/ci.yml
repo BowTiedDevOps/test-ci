@@ -1,0 +1,42 @@
+## The main Github Actions workflow
+name: CI
+
+on:
+  merge_group:
+    types:
+      - checks_requested
+  push:
+    branches:
+      - master
+      - develop
+      - next
+    paths-ignore:
+      - "**.md"
+      - "**.yml"
+  workflow_dispatch:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: ci-${{ github.head_ref || github.ref || github.run_id }}
+  ## Always cancel duplicate jobs
+  cancel-in-progress: true
+
+run-name: ${{ github.ref_name }}
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Tests
+        run: |
+          echo "Ran Tests"
